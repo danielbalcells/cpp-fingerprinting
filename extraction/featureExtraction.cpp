@@ -3,6 +3,7 @@
 #include <fstream>  //Used for log file handling
 #include <unistd.h> //Used for option handling
 #include "aquila/aquila.h" //Used for audio processing
+#include "RecomovieSpectrogram.h"
 using namespace std;
 
 /*
@@ -10,10 +11,11 @@ using namespace std;
  * fingerprinting audio descriptor.
  */
 
-Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile);
-Aquila::Spectrogram computeLog(Aquila::Spectrogram spectrogram);
-Aquila::Spectrogram subtractMean(Aquila::Spectrogram logSpectrogram);
-Aquila::Spectrogram hpFilterRows(Aquila::Spectrogram zmlSpectrogram);
+RecomovieSpectrogram computeSpectrogram(Aquila::WaveFile inFile);
+RecomovieSpectrogram computeLog(RecomovieSpectrogram spectrogram);
+RecomovieSpectrogram subtractMean(RecomovieSpectrogram logSpectrogram);
+RecomovieSpectrogram hpFilterRows(RecomovieSpectrogram zmlSpectrogram);
+int** extractMaxes(RecomovieSpectrogram hpfZMLSpectrogram);
 
 int main(int argc, char** argv) {
 
