@@ -6,13 +6,14 @@
  */
 
 #include <cstdlib>
+#include <vector>
 #include "aquila/transform/Spectrogram.h"
 
 
 /*
  * 
  */
-RecomovieSpectrogram hpFilterRows(RecomovieSpectrogram zmlSpectrogram){
+std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram){
 
     return 0;
 }
