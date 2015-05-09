@@ -1,7 +1,5 @@
 #include <cstdlib>
-#include "aquila/source/WaveFile.h"
-#include "aquila/transform/Spectrogram.h"
-
+#include <aquila/aquila.h>
 
 /*
  * This function takes a WaveFile as input and computes its spectrogram.
