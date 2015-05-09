@@ -2,7 +2,7 @@
 #include <iostream> //Used for basic prints
 #include <fstream>  //Used for log file handling
 #include <unistd.h> //Used for option handling
-#include "aquila/aquila.h" //Used for audio processing
+#include <aquila/aquila.h> //Used for audio processing
 #include <vector>   
 
 //using namespace std;
