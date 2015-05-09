@@ -6,13 +6,14 @@
  */
 
 #include <cstdlib>
+#include <vector>
 
-using namespace std;
+
 
 /*
  * 
  */
-int** extractMaxes(RecomovieSpectrogram hpfZMLSpectrogram){
-
-    return 0;
+std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram){
+    std::vector<std::vector<int>> zmlSpectrogram(4,std::vector<int>(2));
+    return zmlSpectrogram;
 }

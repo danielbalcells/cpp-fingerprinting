@@ -10,12 +10,33 @@
 #include "aquila/transform/Spectrogram.h"
 
 
+
 /*
  * Subtracts the mean of the input log spectrogram to make it zero-mean
  */
 std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram){
-    double mean;
+    double mean = 0;
+    
     int spectrogramLength = logSpectrogram.size();
-    int a = 0;
-return 0;
+    int spectrogramHeight = logSpectrogram[0].size();
+    std::vector<std::vector<double>> zmlSpectrogram(spectrogramLength,spectrogramHeight);
+    
+    //find mean
+    int i,j;
+    for(i=0; i<spectrogramLength; i++){
+        for(j=0; j<spectrogramHeight; j++){
+            mean += logSpectrogram[i][j];
+        }
+    }
+    mean = mean/(spectrogramLength*spectrogramHeight);
+    
+    //subtract mean
+    int i,j;
+    for(i=0; i<spectrogramLength; i++){
+        for(j=0; j<spectrogramHeight; j++){
+            zmlSpectrogram[i][j] = logSpectrogram[i][j]-mean;
+        }
+    }
+    
+return zmlSpectrogram;
 }

@@ -14,6 +14,6 @@
  * 
  */
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram){
-
-    return 0;
+    std::vector<std::vector<double>> hpfZMLSpectrogram(4,std::vector<double>(2));
+    return hpfZMLSpectrogram;
 }

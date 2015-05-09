@@ -13,7 +13,7 @@
  */
 
 Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile);
-std::vector<std::vector<double>> computeLog(RecomovieSpectrogram spectrogram);
+std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram);
 std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram);
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram);
 std::vector<std::vector<int>> findPoints(std::vector<std::vector<double>> hpfZMLSpectrogram);
