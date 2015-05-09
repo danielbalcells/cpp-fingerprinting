@@ -6,13 +6,14 @@
  */
 
 #include <cstdlib>
+#include <vector>
 #include "aquila/transform/Spectrogram.h"
 
 
 /*
  * Subtracts the mean of the input log spectrogram to make it zero-mean
  */
-RecomovieSpectrogram subtractMean(RecomovieSpectrogram logSpectrogram){
+std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram){
 
 return 0;
 }
