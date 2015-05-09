@@ -1,13 +1,14 @@
 #include <cstdlib>
-#include <aquila/aquila.h>
+#include "aquila/source/WaveFile.h"
+#include "aquila/transform/Spectrogram.h"
 
 /*
- * TODO: documentation
+ * Computes the spectrogram of an audio file.
  */
-Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile) {
+Aquila::RecomovieSpectrogram computeSpectrogram(Aquila::WaveFile inFile) {
     Aquila::FramesCollection frames;
     frames = Aquila::FramesCollection(inFile, 512, 256);
-    Aquila::Spectrogram spectrogram = Aquila::Spectrogram(frames);
+    Aquila::RecomovieSpectrogram spectrogram = Aquila::RecomovieSpectrogram(frames);
     
     return spectrogram;
 }

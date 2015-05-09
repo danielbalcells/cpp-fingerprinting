@@ -10,10 +10,11 @@ using namespace std;
  * fingerprinting audio descriptor.
  */
 
-Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile);
-Aquila::Spectrogram computeLog(Aquila::Spectrogram spectrogram);
-Aquila::Spectrogram subtractMean(Aquila::Spectrogram logSpectrogram);
-Aquila::Spectrogram hpFilterRows(Aquila::Spectrogram zmlSpectrogram);
+Aquila::RecomovieSpectrogram computeSpectrogram(Aquila::WaveFile inFile);
+Aquila::RecomovieSpectrogram computeLog(Aquila::RecomovieSpectrogram spectrogram);
+Aquila::RecomovieSpectrogram subtractMean(Aquila::RecomovieSpectrogram logSpectrogram);
+Aquila::RecomovieSpectrogram hpFilterRows(Aquila::RecomovieSpectrogram zmlSpectrogram);
+int** extractMaxes(Aquila::RecomovieSpectrogram hpfZMLSpectrogram);
 
 int main(int argc, char** argv) {
 
