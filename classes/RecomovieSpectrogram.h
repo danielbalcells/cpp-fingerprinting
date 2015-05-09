@@ -11,8 +11,7 @@
 
 class RecomovieSpectrogram: public Aquila::Spectrogram {
 public:
-    RecomovieSpectrogram computeLog();
-    RecomovieSpectrogram subtractMean();
+    double** toMatrix();
 private:
 
 };

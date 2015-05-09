@@ -7,11 +7,7 @@
 
 #include "RecomovieSpectrogram.h"
 
-RecomovieSpectrogram computeLog(){
-    return NULL;
-}
-
-RecomovieSpectrogram subtractMean(){
-    return NULL;
+double** toMatrix(){
+    
 }
 
