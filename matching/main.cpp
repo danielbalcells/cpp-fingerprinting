@@ -7,14 +7,14 @@
 
 #include <cstdlib>
 #include "aquila/aquila.h"
-
-using namespace std;
-
-/*
- * 
- */
-int main(int argc, char** argv) {
-//Aixo es un comentari
-    return 0;
-}
-
+//
+//using namespace std;
+//
+///*
+// * 
+// */
+//int main(int argc, char** argv) {
+////Aixo es un comentari
+//    return 0;
+//}
+//
