@@ -14,6 +14,8 @@
  * Subtracts the mean of the input log spectrogram to make it zero-mean
  */
 std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram){
-
+    double mean;
+    int spectrogramLength = logSpectrogram.size();
+    int a = 0;
 return 0;
 }
