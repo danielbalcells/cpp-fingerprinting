@@ -65,19 +65,19 @@ int main(int argc, char** argv) {
     
     //Fun starts here
     
-    //Load audio
+    //Load audio DONE
     Aquila::WaveFile audio8kHz = load8kHzfile(inputFileName);
     if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n";}
     
-    //Obtain spectrogram
+    //Obtain spectrogram DONE
     Aquila::Spectrogram spectrogram = computeSpectrogram(audio8kHz);
     if(logEnable == 1){logFile << "Computed Spectrogram.\n";}
     
-    //Obtain log spectrogram
+    //Obtain log spectrogram DONE
     std::vector<std::vector<double>> logSpectrogram = computeLog(spectrogram);
     if(logEnable == 1){logFile << "Computed Log Spectrogram.\n";}
     
-    //Obtain zero-mean spectrogram
+    //Obtain zero-mean spectrogram DONE
     std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram);
     if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
     
