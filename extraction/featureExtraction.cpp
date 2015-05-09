@@ -4,7 +4,7 @@
 #include <unistd.h> //Used for option handling
 #include "aquila/aquila.h" //Used for audio processing
 #include "RecomovieSpectrogram.h"
-using namespace std;
+//using namespace std;
 
 /*
  * This function is the controller for the feature extraction stage of the Recomovie
@@ -37,23 +37,23 @@ int main(int argc, char** argv) {
     std::string inputFileName, outputFileName, logFileName;
     int filmID = 0;
     int logEnable = 0;
-    ofstream logFile;
+    std::ofstream logFile;
     
     while((opt = getopt(argc,argv,commandLineOpts.c_str())) != -1){
         switch(opt){
             case 'i':
-                inputFileName = string(optarg);
+                inputFileName = std::string(optarg);
                 break;
             case 'o':
-                outputFileName = string(optarg);
+                outputFileName = std::string(optarg);
                 break;
             case 'I':
-                filmID = std::stoi(string(optarg));
+                filmID = std::stoi(std::string(optarg));
                 break;
             case 'l':
                 logEnable = 1;
-                logFileName = string(optarg);
-                logFile.open(logFileName, ios::app);
+                logFileName = std::string(optarg);
+                logFile.open(logFileName, std::ios::app);
                 logFile << "Log for Recomovie Fingerprinting Feature Extraction.\nRecomovie\nPAE - May 2015\n";
                 break;
         }

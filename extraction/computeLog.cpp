@@ -3,6 +3,6 @@
 #include "RecomovieSpectrogram.h"
 #include <aquila/aquila.h>
 
-RecomovieSpectrogram computeLog(Aquila::RecomovieSpectrogram spectrogram) {
+RecomovieSpectrogram computeLog(RecomovieSpectrogram spectrogram) {
     
 }
