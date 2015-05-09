@@ -9,6 +9,12 @@ using namespace std;
  * This function is the controller for the feature extraction stage of the Recomovie
  * fingerprinting audio descriptor.
  */
+
+Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile);
+Aquila::Spectrogram computeLog(Aquila::Spectrogram spectrogram);
+Aquila::Spectrogram subtractMean(Aquila::Spectrogram logSpectrogram);
+Aquila::Spectrogram hpFilterRows(Aquila::Spectrogram zmlSpectrogram);
+
 int main(int argc, char** argv) {
 
     /*Define command-line options here:
