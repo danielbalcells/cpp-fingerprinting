@@ -12,7 +12,7 @@ using namespace std;
 /*
  * 
  */
-int** extractMaxes(Aquila::RecomovieSpectrogram hpfZMLSpectrogram){
+int** extractMaxes(RecomovieSpectrogram hpfZMLSpectrogram){
 
     return 0;
 }

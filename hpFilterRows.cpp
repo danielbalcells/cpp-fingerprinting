@@ -12,7 +12,7 @@
 /*
  * 
  */
-Aquila::RecomovieSpectrogram hpFilterRows(Aquila::RecomovieSpectrogram zmlSpectrogram){
+RecomovieSpectrogram hpFilterRows(RecomovieSpectrogram zmlSpectrogram){
 
     return 0;
 }

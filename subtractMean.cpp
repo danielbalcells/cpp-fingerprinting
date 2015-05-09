@@ -12,7 +12,7 @@
 /*
  * Subtracts the mean of the input log spectrogram to make it zero-mean
  */
-Aquila::RecomovieSpectrogram subtractMean(Aquila::RecomovieSpectrogram logSpectrogram){
+RecomovieSpectrogram subtractMean(RecomovieSpectrogram logSpectrogram){
 
 return 0;
 }
