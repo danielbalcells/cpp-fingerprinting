@@ -89,7 +89,7 @@ int main(int argc, char** argv) {
     std::vector<std::vector<int>> maxes = extractMaxes(hpfZMLSpectrogram);
     if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
     
-    //Pair salient points
+    //Pair salient points DONE
     std::vector<std::vector<int>> pointPairs = pairPoints(maxes);
     if(logEnable == 1){logFile << "Paired points.\n";}
     
