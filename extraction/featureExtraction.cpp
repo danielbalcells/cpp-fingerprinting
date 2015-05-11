@@ -99,9 +99,18 @@ int main(int argc, char** argv) {
         logFile << " Done.\n\n";
     }
         
-    //Obtain zero-mean spectrogram DONE
-    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram, logEnable, logFile);
-    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n\n";}
+//    //Obtain zero-mean spectrogram DONE, CURRENTLY DISABLED
+//    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram, logEnable, logFile);
+//    if(logEnable == 1){
+//        logFile << "Computed Zero-Mean Log Spectrogram.\n";
+//        //Plot zero-mean log spectrogram to file
+//        std::string zmlSpect = "zmlSpectrogram.txt";
+//        std::ofstream zmlSpectrogramFile;
+//        zmlSpectrogramFile.open(zmlSpect, std::ios::app);
+//        logFile << "Printing Log Spectrogram to file " + zmlSpect + "...";
+//        printDoubleMatrix(zmlSpectrogram,zmlSpectrogramFile);
+//        logFile << " Done.\n\n";
+//    }
 //    
 ////    //Filter spectrogram rows CURRENTLY DISABLED
 ////    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
@@ -111,9 +120,9 @@ int main(int argc, char** argv) {
 ////    std::vector<std::vector<int>> maxes = extractMaxes(hpfZMLSpectrogram);
 ////    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
 //    
-//    //Extract salient points from zero-mean spectrogram
-//    std::vector<std::vector<int>> maxes = extractMaxes(zmlSpectrogram);
-//    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
+    //Extract salient points from log spectrogram
+    std::vector<std::vector<int>> maxes = extractMaxes(logSpectrogram);
+    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
 //    
 //    //Pair salient points DONE
 //    std::vector<std::vector<int>> pointPairs = pairPoints(maxes);
