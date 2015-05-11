@@ -19,7 +19,7 @@ std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> l
     
     int spectrogramLength = logSpectrogram.size();
     int spectrogramHeight = logSpectrogram[0].size();
-    std::vector<std::vector<double>> zmlSpectrogram(spectrogramLength,spectrogramHeight);
+    std::vector<std::vector<double>> zmlSpectrogram(spectrogramLength,std::vector<double>(spectrogramHeight));
     
     //find mean
     int i,j;
@@ -31,7 +31,6 @@ std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> l
     mean = mean/(spectrogramLength*spectrogramHeight);
     
     //subtract mean
-    int i,j;
     for(i=0; i<spectrogramLength; i++){
         for(j=0; j<spectrogramHeight; j++){
             zmlSpectrogram[i][j] = logSpectrogram[i][j]-mean;
