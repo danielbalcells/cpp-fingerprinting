@@ -17,7 +17,7 @@
 Aquila::WaveFile load8kHzfile(std::string inputFileName, int logEnable, std::ofstream& logFile);
 Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram, int logEnable, std::ofstream& logFile);
-std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram, int logEnable, std::ofstream& logFile);
+std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>>& logSpectrogram, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram);
 std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram);
 std::vector<std::vector<int>> pairPoints(std::vector<std::vector<double>> maxes);
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
         
     //Obtain zero-mean spectrogram DONE
     std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram, logEnable, logFile);
-    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
+    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n\n";}
 //    
 ////    //Filter spectrogram rows CURRENTLY DISABLED
 ////    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
