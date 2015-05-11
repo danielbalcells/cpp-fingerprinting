@@ -23,6 +23,7 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
 std::vector<std::vector<int>> pairPoints(std::vector<std::vector<double>> maxes);
 std::unordered_multimap<std::vector<int>,std::vector<int>> formatMultimap(std::vector<std::vector<int>> pointPairs);
 void printDoubleMatrix(std::vector<std::vector<double>>& inputMatrix, std::ofstream& printFile);
+void printIntMatrix(std::vector<std::vector<int>>& inputMatrix, std::ofstream& printFile);
 
 int main(int argc, char** argv) {
     /*Get timestamp, for logs*/
@@ -122,7 +123,17 @@ int main(int argc, char** argv) {
 //    
     //Extract salient points from log spectrogram
     std::vector<std::vector<int>> maxes = extractMaxes(logSpectrogram);
-    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
+    if(logEnable == 1){
+        logFile << "Extracted salient spectrogram points.\n";
+        
+        //Plot maxes to file
+        std::string maxesName = "maxes.txt";
+        std::ofstream maxesFile;
+        maxesFile.open(maxesName, std::ios::app);
+        logFile << "Printing Log Spectrogram to file " + maxesName + "...";
+        printDoubleMatrix(maxes,maxesFile);
+        logFile << " Done.\n\n";
+    }
 //    
 //    //Pair salient points DONE
 //    std::vector<std::vector<int>> pointPairs = pairPoints(maxes);
