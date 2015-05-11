@@ -14,6 +14,5 @@
  * 
  */
 std::unordered_multimap<std::vector<int>,std::vector<int>> formatMultimap(std::vector<std::vector<int>> pointPairs){
-
-    return 0;
+    
 }
