@@ -5,6 +5,8 @@
 #include <aquila/aquila.h> //Used for audio processing
 #include <vector>
 #include <unordered_map>
+#include <time.h>
+#include <exception>
 
 //using namespace std;
 
@@ -13,16 +15,23 @@
  * fingerprinting audio descriptor.
  */
 Aquila::WaveFile load8kHzfile(std::string inputFileName, int logEnable, std::ofstream& logFile);
-Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile);
-std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram);
-std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram);
+Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile, int logEnable, std::ofstream& logFile);
+std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram, int logEnable, std::ofstream& logFile);
+std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram);
 std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram);
 std::vector<std::vector<int>> pairPoints(std::vector<std::vector<double>> maxes);
 std::unordered_multimap<std::vector<int>,std::vector<int>> formatMultimap(std::vector<std::vector<int>> pointPairs);
+void printDoubleMatrix(std::vector<std::vector<double>>& inputMatrix, std::ofstream& printFile);
 
 int main(int argc, char** argv) {
+    /*Get timestamp, for logs*/
+    time_t rawtime;
+    struct tm * timeinfo;
 
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    
     /*Define command-line options here:
     One letter per allowed option. 
     Add a colon for options that accept arguments*/
@@ -58,7 +67,8 @@ int main(int argc, char** argv) {
                 logEnable = 1;
                 logFileName = std::string(optarg);
                 logFile.open(logFileName, std::ios::app);
-                logFile << "Log for Recomovie Fingerprinting Feature Extraction.\nRecomovie\nPAE - May 2015\n";
+                logFile << "Log for Recomovie Fingerprinting Feature Extraction.\nRecomovie PAE - May 2015\n";
+                logFile << std::string(asctime(timeinfo)) + "\n\n";
                 break;
         }
     }
@@ -66,20 +76,32 @@ int main(int argc, char** argv) {
     //Fun starts here
     
     //Load audio DONE
+    try{
     Aquila::WaveFile audio8kHz = load8kHzfile(inputFileName,logEnable,logFile);
-    if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n";}
+    if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n\n";}
+       
     
-//    //Obtain spectrogram DONE
-//    Aquila::Spectrogram spectrogram = computeSpectrogram(audio8kHz);
-//    if(logEnable == 1){logFile << "Computed Spectrogram.\n";}
-//    
-//    //Obtain log spectrogram DONE
-//    std::vector<std::vector<double>> logSpectrogram = computeLog(spectrogram);
-//    if(logEnable == 1){logFile << "Computed Log Spectrogram.\n";}
-//    
-//    //Obtain zero-mean spectrogram DONE
-//    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram);
-//    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
+    //Obtain spectrogram DONE
+    Aquila::Spectrogram spectrogram = computeSpectrogram(audio8kHz, logEnable, logFile);
+    if(logEnable == 1){logFile << " Done.\n\n";}
+    
+    //Obtain log spectrogram DONE
+    std::vector<std::vector<double>> logSpectrogram = computeLog(spectrogram, logEnable, logFile);
+    if(logEnable == 1){
+        logFile << " Done.\n";
+    
+        //Plot log spectrogram to file
+        std::string logSpect = "logSpectrogram.txt";
+        std::ofstream logSpectrogramFile;
+        logSpectrogramFile.open(logSpect, std::ios::app);
+        logFile << "Printing Log Spectrogram to file " + logSpect + "...";
+        printDoubleMatrix(logSpectrogram,logSpectrogramFile);
+        logFile << " Done.\n\n";
+    }
+        
+    //Obtain zero-mean spectrogram DONE
+    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram, logEnable, logFile);
+    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
 //    
 ////    //Filter spectrogram rows CURRENTLY DISABLED
 ////    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
@@ -100,10 +122,13 @@ int main(int argc, char** argv) {
 //    //Format points into unordered multimap
 //    std::unordered_multimap<std::vector<int>,std::vector<int>> featureMultimap = formatMultimap(pointPairs,filmID);
 //    if(logEnable == 1){logFile << "Paired points.\n";}
-    
-    
+       
     
     if(logEnable == 1){logFile << "----------------------------------------------------\n\n\n";}
     return 0;
+    }
+    catch(std::exception& e){
+        if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n\n";}
+    }
 }
 
