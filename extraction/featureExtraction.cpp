@@ -12,7 +12,7 @@
  * This function is the controller for the feature extraction stage of the Recomovie
  * fingerprinting audio descriptor.
  */
-Aquila::WaveFile load8kHzfile(std::string inputFileName44K);
+Aquila::WaveFile load8kHzfile(std::string inputFileName, int logEnable, std::ofstream& logFile);
 Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile);
 std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram);
 std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>> logSpectrogram);
@@ -66,42 +66,44 @@ int main(int argc, char** argv) {
     //Fun starts here
     
     //Load audio DONE
-    Aquila::WaveFile audio8kHz = load8kHzfile(inputFileName);
+    Aquila::WaveFile audio8kHz = load8kHzfile(inputFileName,logEnable,logFile);
     if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n";}
     
-    //Obtain spectrogram DONE
-    Aquila::Spectrogram spectrogram = computeSpectrogram(audio8kHz);
-    if(logEnable == 1){logFile << "Computed Spectrogram.\n";}
-    
-    //Obtain log spectrogram DONE
-    std::vector<std::vector<double>> logSpectrogram = computeLog(spectrogram);
-    if(logEnable == 1){logFile << "Computed Log Spectrogram.\n";}
-    
-    //Obtain zero-mean spectrogram DONE
-    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram);
-    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
-    
-//    //Filter spectrogram rows CURRENTLY DISABLED
-//    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
-//    if(logEnable == 1){logFile << "Filtered Spectrogram rows.\n";}*/
+//    //Obtain spectrogram DONE
+//    Aquila::Spectrogram spectrogram = computeSpectrogram(audio8kHz);
+//    if(logEnable == 1){logFile << "Computed Spectrogram.\n";}
 //    
-//    //Extract salient points from filtered spectrogram
-//    std::vector<std::vector<int>> maxes = extractMaxes(hpfZMLSpectrogram);
+//    //Obtain log spectrogram DONE
+//    std::vector<std::vector<double>> logSpectrogram = computeLog(spectrogram);
+//    if(logEnable == 1){logFile << "Computed Log Spectrogram.\n";}
+//    
+//    //Obtain zero-mean spectrogram DONE
+//    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram);
+//    if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
+//    
+////    //Filter spectrogram rows CURRENTLY DISABLED
+////    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
+////    if(logEnable == 1){logFile << "Filtered Spectrogram rows.\n";}*/
+////    
+////    //Extract salient points from filtered spectrogram
+////    std::vector<std::vector<int>> maxes = extractMaxes(hpfZMLSpectrogram);
+////    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
+//    
+//    //Extract salient points from zero-mean spectrogram
+//    std::vector<std::vector<int>> maxes = extractMaxes(zmlSpectrogram);
 //    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
-    
-    //Extract salient points from zero-mean spectrogram
-    std::vector<std::vector<int>> maxes = extractMaxes(zmlSpectrogram);
-    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
-    
-    //Pair salient points DONE
-    std::vector<std::vector<int>> pointPairs = pairPoints(maxes);
-    if(logEnable == 1){logFile << "Paired points.\n";}
-    
-    //Format points into unordered multimap
-    std::unordered_multimap<std::vector<int>,std::vector<int>> featureMultimap = formatMultimap(pointPairs,filmID);
-    if(logEnable == 1){logFile << "Paired points.\n";}
+//    
+//    //Pair salient points DONE
+//    std::vector<std::vector<int>> pointPairs = pairPoints(maxes);
+//    if(logEnable == 1){logFile << "Paired points.\n";}
+//    
+//    //Format points into unordered multimap
+//    std::unordered_multimap<std::vector<int>,std::vector<int>> featureMultimap = formatMultimap(pointPairs,filmID);
+//    if(logEnable == 1){logFile << "Paired points.\n";}
     
     
+    
+    if(logEnable == 1){logFile << "----------------------------------------------------\n\n\n";}
     return 0;
 }
 

@@ -21,7 +21,7 @@ std::vector<std::vector<int>> pairPoints(std::vector<std::vector<int>> maxes){
     int rectangleBottom = -32;
     
     //Each pair is F1:F2:T2-T1:T1
-    std::vector<std::vector<int>> pointPairs(numPoints*maxPairsPerPoint,4);
+    std::vector<std::vector<int>> pointPairs(numPoints*maxPairsPerPoint,std::vector<int>(4));
     
     int i,j,currentPointPairs;
     int numPairs = 0;
@@ -46,5 +46,5 @@ std::vector<std::vector<int>> pairPoints(std::vector<std::vector<int>> maxes){
             }
         }
     }
-    return 0;
+    return pointPairs;
 }
