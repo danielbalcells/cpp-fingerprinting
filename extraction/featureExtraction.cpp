@@ -81,11 +81,15 @@ int main(int argc, char** argv) {
     std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram);
     if(logEnable == 1){logFile << "Computed Zero-Mean Log Spectrogram.\n";}
     
-    //Filter spectrogram rows
-    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
-    if(logEnable == 1){logFile << "Filtered Spectrogram rows.\n";}*/
+//    //Filter spectrogram rows CURRENTLY DISABLED
+//    /*std::vector<std::vector<double>> hpfZMLSpectrogram = hpFilterRows(zmlSpectrogram);
+//    if(logEnable == 1){logFile << "Filtered Spectrogram rows.\n";}*/
+//    
+//    //Extract salient points from filtered spectrogram
+//    std::vector<std::vector<int>> maxes = extractMaxes(hpfZMLSpectrogram);
+//    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
     
-    //Extract salient points from filtered spectrogram
+    //Extract salient points from zero-mean spectrogram
     std::vector<std::vector<int>> maxes = extractMaxes(zmlSpectrogram);
     if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
     
