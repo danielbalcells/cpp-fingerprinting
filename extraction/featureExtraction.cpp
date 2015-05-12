@@ -20,16 +20,16 @@ std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram, int
 std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>>& logSpectrogram, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram);
 std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram);
-std::vector<std::vector<int>> pairPoints(std::vector<std::vector<double>> maxes);
+std::vector<std::vector<int>> pairPoints(std::vector<std::vector<int>> maxes, int logEnable, std::ofstream& logFile);
 std::unordered_multimap<std::vector<int>,std::vector<int>> formatMultimap(std::vector<std::vector<int>> pointPairs);
 void printDoubleMatrix(std::vector<std::vector<double>>& inputMatrix, std::ofstream& printFile);
 void printIntMatrix(std::vector<std::vector<int>>& inputMatrix, std::ofstream& printFile);
+std::vector<std::vector<int>> extractMaxesDummy(std::vector<std::vector<double>> hpfZMLSpectrogram, int logEnable, std::ofstream& logFile); //Deboogie-woogie
 
 int main(int argc, char** argv) {
     /*Get timestamp, for logs*/
     time_t rawtime;
     struct tm * timeinfo;
-
     time (&rawtime);
     timeinfo = localtime (&rawtime);
     
@@ -94,13 +94,13 @@ int main(int argc, char** argv) {
         //Plot log spectrogram to file
         std::string logSpect = "logSpectrogram.txt";
         std::ofstream logSpectrogramFile;
-        logSpectrogramFile.open(logSpect, std::ios::app);
+        logSpectrogramFile.open(logSpect, std::ios::trunc);
         logFile << "Printing Log Spectrogram to file " + logSpect + "...";
         printDoubleMatrix(logSpectrogram,logSpectrogramFile);
         logFile << " Done.\n\n";
     }
         
-//    //Obtain zero-mean spectrogram DONE, CURRENTLY DISABLED
+//    //Obtain zero-mean log spectrogram DONE, CURRENTLY DISABLED
 //    std::vector<std::vector<double>> zmlSpectrogram = subtractMean(logSpectrogram, logEnable, logFile);
 //    if(logEnable == 1){
 //        logFile << "Computed Zero-Mean Log Spectrogram.\n";
@@ -122,22 +122,33 @@ int main(int argc, char** argv) {
 ////    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
 //    
     //Extract salient points from log spectrogram
-    std::vector<std::vector<int>> maxes = extractMaxes(logSpectrogram);
+    std::vector<std::vector<int>> maxes = extractMaxesDummy(logSpectrogram,logEnable,logFile);
     if(logEnable == 1){
         logFile << "Extracted salient spectrogram points.\n";
         
         //Plot maxes to file
         std::string maxesName = "maxes.txt";
         std::ofstream maxesFile;
-        maxesFile.open(maxesName, std::ios::app);
-        logFile << "Printing Log Spectrogram to file " + maxesName + "...";
-        printDoubleMatrix(maxes,maxesFile);
+        maxesFile.open(maxesName, std::ios::trunc);
+        logFile << "Printing Maxes to file " + maxesName + "...";
+        printIntMatrix(maxes,maxesFile);
         logFile << " Done.\n\n";
     }
-//    
-//    //Pair salient points DONE
-//    std::vector<std::vector<int>> pointPairs = pairPoints(maxes);
-//    if(logEnable == 1){logFile << "Paired points.\n";}
+    
+    //Pair salient points DONE
+    std::vector<std::vector<int>> pointPairs = pairPoints(maxes,logEnable, logFile);
+    if(logEnable == 1){
+        logFile << "Paired salient spectrogram points.\n";
+        
+        //Plot pairs to file
+        std::string pairsName = "pairs.txt";
+        std::ofstream pairsFile;
+        pairsFile.open(pairsName, std::ios::trunc);
+        logFile << "Printing Pairs to file " + pairsName + "...";
+        printIntMatrix(pointPairs,pairsFile);
+        logFile << " Done.\n\n";
+    }
+    
 //    
 //    //Format points into unordered multimap
 //    std::unordered_multimap<std::vector<int>,std::vector<int>> featureMultimap = formatMultimap(pointPairs,filmID);
