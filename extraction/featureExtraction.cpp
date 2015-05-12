@@ -21,7 +21,9 @@ std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>>& 
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram);
 std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram);
 std::vector<std::vector<int>> pairPoints(std::vector<std::vector<int>> maxes, int logEnable, std::ofstream& logFile);
-std::unordered_multimap<std::vector<int>,std::vector<int>> formatMultimap(std::vector<std::vector<int>> pointPairs);
+std::unordered_multimap<std::bitset<48>,std::bitset<32>> formatMultimap(std::vector<std::vector<int>> pointPairs, int filmID, int logEnable, std::ofstream& logFile);
+
+
 void printDoubleMatrix(std::vector<std::vector<double>>& inputMatrix, std::ofstream& printFile);
 void printIntMatrix(std::vector<std::vector<int>>& inputMatrix, std::ofstream& printFile);
 std::vector<std::vector<int>> extractMaxesDummy(std::vector<std::vector<double>> hpfZMLSpectrogram, int logEnable, std::ofstream& logFile); //Deboogie-woogie
@@ -149,17 +151,18 @@ int main(int argc, char** argv) {
         logFile << " Done.\n\n";
     }
     
-//    
-//    //Format points into unordered multimap
-//    std::unordered_multimap<std::vector<int>,std::vector<int>> featureMultimap = formatMultimap(pointPairs,filmID);
-//    if(logEnable == 1){logFile << "Paired points.\n";}
+    
+    //Format points into unordered multimap
+    std::unordered_multimap<std::bitset<48>,std::bitset<32>> featureMultimap;
+    featureMultimap = formatMultimap(pointPairs,filmID,logEnable,logFile);
+    if(logEnable == 1){logFile << "Formatted multimap.\n\n";}
        
     
-    if(logEnable == 1){logFile << "----------------------------------------------------\n\n\n";}
+    if(logEnable == 1){logFile << "----------------------------------------------------\n\n\n";logFile.close();}
     return 0;
     }
     catch(std::exception& e){
-        if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n\n";}
+        if(logEnable == 1){logFile << "Unknown error.\n";}
     }
 }
 
