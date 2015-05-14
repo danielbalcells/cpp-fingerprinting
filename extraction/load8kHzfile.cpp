@@ -43,7 +43,7 @@ Aquila::WaveFile load8kHzfile(std::string inputFileName, int logEnable, std::ofs
     int read = sf_readf_float(inputFile,inputArray,inputFileInfo.frames);
     
     if(logEnable == 1){
-        logFile << "\nRunning load8kHzfile.\n";
+        logFile << "\nRunning load8kHzfile...\n";
         logFile << "Input file name:\t" << inputFileName << "\n";
         logFile << "Input samples:\t" << std::to_string(inputFileInfo.frames) << "\n";
         logFile << "Input channels:\t" << std::to_string(inputFileInfo.channels) << "\n";
