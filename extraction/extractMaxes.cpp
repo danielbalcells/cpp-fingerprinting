@@ -57,6 +57,7 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
     
     //N is the target hashes-per-sec (approximately; default 5)
     int N = 5;
+    int nFft = hpfZMLSpectrogram[0].size();
     
     //The scheme relies on just a few landmarks being common to both
     //query and reference items.  The greater the density of landmarks,
@@ -133,30 +134,37 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
     // initial threshold envelope based on peaks in first 10 frames
     //double sthresh;
     int nFrames = hpfZMLSpectrogram.size();
+    //MINIMUM IS 10 EXCEPT IF THE NUMBER OF DFTs IN THE SPECTROGRAM IS LESS.
     int minimum;
     //NO HE SAPIGUT FERHO AMB LA FUNCIO MIN() NO SE PERQUE CONY.
-    if (10 < hpfZMLSpectrogram.size()){
+    //int minimum = std::min(10,hpfZMLSpectrogram.size());
+    if (10 < hpfZMLSpectrogram.size())
         minimum = 10;
-    }
     else
         minimum = hpfZMLSpectrogram.size();
-    //int minimum = std::min(10,hpfZMLSpectrogram.size());
-    double firstMaxes[10];
-    for (int i=0;i<minimum;i++){
-        firstMaxes[i] = *std::max_element(hpfZMLSpectrogram[i].begin(),hpfZMLSpectrogram[i].end());
+    //WE FIND THE MAXES IN THE FIRST DFTs AND CALCULATE THE INITIAL THRESHOLD WITH THEM.
+    std::vector<double> firstMaxesVector;
+            //double firstMaxes[minimum];
+    
+    std::vector<double> spectrogramRow;
+    for (int j=0; j<nFft; j++){
+        for (int i=0; i<minimum; i++){
+            spectrogramRow[i] = hpfZMLSpectrogram[i][j];
+        }
+        firstMaxesVector[j] = *std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow));
     }
+    
     std::vector<double> sthresh;
-    std::vector<double> firstMaxesVector(std::begin(firstMaxes),std::end(firstMaxes));
+            //std::vector<double> firstMaxesVector(std::begin(firstMaxes),std::end(firstMaxes));
     sthresh = spread(firstMaxesVector, f_sd);
-    std::vector<double> eww;
-    //
+    std::vector<double> eww; //NO EM MOLA DECLARARHO AQUI EN VERDA PERO NO TINC CAP IDEA MILLOR. HO MIREM
     
     //EXTRACT MAXES OF THE SPECTROGRAM
     int thisFrameIndex = 0;
     for (thisFrameIndex=0; thisFrameIndex<nFrames; thisFrameIndex++){
         std::vector<double> thisFrame = hpfZMLSpectrogram[thisFrameIndex];
         std::vector<double> sdiff;
-        for (int i=0; i<thisFrame.size()-1;i++){
+        for (int i=0; i<thisFrame.size();i++){
             sdiff[i] = std::fmax(0,thisFrame[i]-sthresh[i]);
         }
         sdiff = locMax(sdiff);
@@ -240,13 +248,19 @@ std::vector<double> locMax(std::vector<double> x){
     int i=0;
     std::valarray<double> nbr;
     std::valarray<double> yValArray;
+    std::valarray<double> xValArray(x.data(), x.size());
     std::vector<double> y;
-    nbr[0]=0;
+    nbr[0]=1;
     for (i=1;i<x.size();i++){
         nbr[i] = x[i]>=x[i-1];
     }
-    std::valarray<double> xValArray(x.data(), x.size());
-    yValArray = xValArray*nbr;
+    std::vector<double> nbrAux;
+    nbrAux.assign(std::begin(nbr)+1,std::end(nbr));
+    std::valarray<double> nbr2(nbrAux.data(),nbrAux.size()+1);
+    nbr2[nbr2.size()]=1;
+    nbr2 *= -1;
+    nbr2 = nbr2+1;
+    yValArray = xValArray*nbr*nbr2;
     y.assign(std::begin(yValArray), std::end(yValArray));
     return y;
 }
@@ -263,11 +277,10 @@ std::vector<double> spread(std::vector<double> x, int sd){
     std::vector<double> EE;
     std::vector<double> EE2;
     std::valarray<double> y(xLocMaxes.data(),xLocMaxes.size());
-    y = 0*y;
+    y *= 0;
     for(int i=-W; i<W+1; i++){
-        gaussIndexs[i]=i/W;
         //E=exp(-0.5*[(-W:W)/E].^2);
-        E[i] = exp(-0.5*(pow((gaussIndexs[i]/sd),2)));
+        E[i] = exp(-0.5*(pow((i/sd),2)));
     }
     int lenx = x.size();
     int maxi = lenx + E.size();
@@ -278,7 +291,7 @@ std::vector<double> spread(std::vector<double> x, int sd){
             std::fill(std::begin(EE), std::begin(EE)+i, 0);
             EE.insert(std::begin(EE)+i+1, std::begin(E), std::end(E));
             EE[maxi]=0;
-            EE2 = std::vector<double>(std::begin(EE)+spos+2,std::begin(EE)+spos+2+lenx); //WE ADD 2 AS IN C++ THE FIRST INDEX IS 0, WHEREAS IN MATLAB IS 1
+            EE2 = std::vector<double>(std::begin(EE)+spos,std::begin(EE)+spos+lenx);
             for(int i=0; i<lenx; i++){
                 y[i] = std::fmax(y[i], locMaxi*EE2[i]);
             }
