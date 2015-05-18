@@ -166,7 +166,7 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
             spectrogramRow[i] = hpfZMLSpectrogram[i][j];
         }
         firstMaxesVector.push_back(*std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow)));
-        //if(logEnable == 1){logFile << "\tFbin #" + std::to_string(j) + ":\t" + std::to_string(*std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow))) +"\n";}
+        if(logEnable == 1){logFile << "\tFbin #" + std::to_string(j) + ":\t" + std::to_string(*std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow))) +"\n";}
     }
     std::vector<double> sthresh;
     sthresh = spread(firstMaxesVector, f_sd);
@@ -178,9 +178,9 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
         std::vector<double> thisFrame = hpfZMLSpectrogram[thisFrameIndex];
         std::vector<double> sdiff(thisFrame.size());
         for (int i=0; i<thisFrame.size();i++){
-            sdiff[i] = std::fmax(0,thisFrame[i]-(0.5*sthresh[i]));
+            sdiff[i] = std::fmax(0,thisFrame[i]-(sthresh[i]));
         }
-        logFile << "This are sdiff, sthresh , (thisFrame[i]-sthresh[i]) and thisFrame[i]:\n";
+        logFile << "These are sdiff, sthresh , (thisFrame[i]-sthresh[i]) and thisFrame[i]:\n";
         for (int i=0; i<sdiff.size(); i++){
             logFile << std::to_string(sdiff[i]) << "      ";
             logFile << std::to_string(sthresh[i]) << "      ";
@@ -188,12 +188,12 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
             logFile << std::to_string(thisFrame[i]) << "\n";
         }
         sdiff = locMax(sdiff);
-        std::vector<double> thisFrameLocMax;
-        thisFrameLocMax = locMax(thisFrame);
-        logFile << "This are thisFrame locMaxes:\n";
-        for (int i=0; i<thisFrame.size(); i++){
-            logFile << std::to_string(thisFrameLocMax[i]) << "\n";
-        }
+//        std::vector<double> thisFrameLocMax;
+//        thisFrameLocMax = locMax(thisFrame);
+//        logFile << "These are thisFrame locMaxes:\n";
+//        for (int i=0; i<thisFrame.size(); i++){
+//            logFile << std::to_string(thisFrameLocMax[i]) << "\n";
+//        }
         //MAKE SURE LAST BIN IS ALWAYS 0. NOT NEEDED IN C++ AS FIRST INDEX IS 0.
         //sdiff[thisFrame.size()-1] = 0;
         std::vector<int> sortedIndexs = sort_indexes(sdiff);
@@ -388,7 +388,7 @@ std::vector<double> spread(std::vector<double> x, int sd){
 //        logFile << std::to_string(retVector[i]) << std::endl;
 //    }
 //    logFile << "\n\nReturning control to extractMaxes.\n\n";
-//    return retVector;
+    return retVector;
 }
 
 //template <typename T>
