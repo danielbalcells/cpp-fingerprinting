@@ -24,3 +24,14 @@ void printIntMatrix(std::vector<std::vector<int>>& inputMatrix, std::ofstream& p
            printFile << "\n";
         }
 }
+
+void printFloatVector(std::vector<float>& inputVector, std::ofstream& printFile) {
+
+    for (int i = 0; i < inputVector.size(); i++ )
+        {
+           
+              printFile << inputVector[i] << '\t';
+           
+           printFile << "\n";
+    }  
+}

@@ -1,3 +1,11 @@
+/* 
+ * File:   extractionController.cpp
+ * Author: daniel
+ *
+ * Created on 14 de mayo de 2015, 13:06
+ */
+
+#include <cstdlib>
 #include <cstdlib>
 #include <iostream> //Used for basic prints
 #include <fstream>  //Used for log file handling
@@ -7,13 +15,8 @@
 #include <unordered_map>
 #include <time.h>
 #include <exception>
+using namespace std;
 
-//using namespace std;
-
-/*
- * This function is the controller for the feature extraction stage of the Recomovie
- * fingerprinting audio descriptor.
- */
 Aquila::WaveFile load8kHzfile(std::string inputFileName, int logEnable, std::ofstream& logFile);
 Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram, int logEnable, std::ofstream& logFile);
@@ -28,58 +31,11 @@ void printDoubleMatrix(std::vector<std::vector<double>>& inputMatrix, std::ofstr
 void printIntMatrix(std::vector<std::vector<int>>& inputMatrix, std::ofstream& printFile);
 std::vector<std::vector<int>> extractMaxesDummy(std::vector<std::vector<double>> hpfZMLSpectrogram, int logEnable, std::ofstream& logFile); //Deboogie-woogie
 
-int main(int argc, char** argv) {
-    /*Get timestamp, for logs*/
-    time_t rawtime;
-    struct tm * timeinfo;
-    time (&rawtime);
-    timeinfo = localtime (&rawtime);
-    
-    /*Define command-line options here:
-    One letter per allowed option. 
-    Add a colon for options that accept arguments*/
-    /*Allowed options:
-     *      -i: Input file name: specifies the path to the audio file to analyze.
-            -o: Output file name: specifies the path to the feature file.
-                If it already exists, the features are appended.
-                If it does not exist, it is created.
-            -I: ID of the film from which the audio has been extracted. Defaults to 0 (recorded sample).
-            -l: Name of the log file. If this option is specified, the program runs
-                in verbose mode and the prints are written to the log file.*/
-    std::string commandLineOpts = "i:o:I:l:";
-    int opt;
-    
-    /*Declare option argument variables here*/
-    std::string inputFileName, outputFileName, logFileName;
-    int filmID = 0;
-    int logEnable = 0;
-    std::ofstream logFile;
-    
-    while((opt = getopt(argc,argv,commandLineOpts.c_str())) != -1){
-        switch(opt){
-            case 'i':
-                inputFileName = std::string(optarg);
-                break;
-            case 'o':
-                outputFileName = std::string(optarg);
-                break;
-            case 'I':
-                filmID = std::stoi(std::string(optarg));
-                break;
-            case 'l':
-                logEnable = 1;
-                logFileName = std::string(optarg);
-                logFile.open(logFileName, std::ios::app);
-                logFile << "Log for Recomovie Fingerprinting Feature Extraction.\nRecomovie PAE - May 2015\n";
-                logFile << std::string(asctime(timeinfo)) + "\n\n";
-                break;
-        }
-    }
-    
-    //Fun starts here
-    
-    //Load audio DONE
-    try{
+/*
+ * Returns the fingerprint descriptor of the input file specified by inputFileName and filmID
+ */
+std::unordered_multimap<std::bitset<48>,std::bitset<32>> featureExtraction(std::string inputFileName, int filmID, int logEnable, std::ofstream& logFile) {
+    //Get 8kHz resampled input file DONE
     Aquila::WaveFile audio8kHz = load8kHzfile(inputFileName,logEnable,logFile);
     if(logEnable == 1){logFile << "Loaded file " << inputFileName << ", resampled to 8kHz.\n\n";}
        
@@ -94,7 +50,7 @@ int main(int argc, char** argv) {
         logFile << " Done.\n";
     
         //Plot log spectrogram to file
-        std::string logSpect = "logSpectrogram.txt";
+        std::string logSpect = "logs/logSpectrogram.txt";
         std::ofstream logSpectrogramFile;
         logSpectrogramFile.open(logSpect, std::ios::trunc);
         logFile << "Printing Log Spectrogram to file " + logSpect + "...";
@@ -107,7 +63,7 @@ int main(int argc, char** argv) {
 //    if(logEnable == 1){
 //        logFile << "Computed Zero-Mean Log Spectrogram.\n";
 //        //Plot zero-mean log spectrogram to file
-//        std::string zmlSpect = "zmlSpectrogram.txt";
+//        std::string zmlSpect = "logs/zmlSpectrogram.txt";
 //        std::ofstream zmlSpectrogramFile;
 //        zmlSpectrogramFile.open(zmlSpect, std::ios::app);
 //        logFile << "Printing Log Spectrogram to file " + zmlSpect + "...";
@@ -123,13 +79,14 @@ int main(int argc, char** argv) {
 ////    std::vector<std::vector<int>> maxes = extractMaxes(hpfZMLSpectrogram);
 ////    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
 //    
-    //Extract salient points from log spectrogram
+    //Extract salient points from log spectrogram 
     std::vector<std::vector<int>> maxes = extractMaxesDummy(logSpectrogram,logEnable,logFile);
-    if(logEnable == 1){
+    if(0 == 1){ //PUNK
+   
         logFile << "Extracted salient spectrogram points.\n";
         
         //Plot maxes to file
-        std::string maxesName = "maxes.txt";
+        std::string maxesName = "logs/sampleMaxes.txt";
         std::ofstream maxesFile;
         maxesFile.open(maxesName, std::ios::trunc);
         logFile << "Printing Maxes to file " + maxesName + "...";
@@ -143,7 +100,7 @@ int main(int argc, char** argv) {
         logFile << "Paired salient spectrogram points.\n";
         
         //Plot pairs to file
-        std::string pairsName = "pairs.txt";
+        std::string pairsName = "logs/samplePairs.txt";
         std::ofstream pairsFile;
         pairsFile.open(pairsName, std::ios::trunc);
         logFile << "Printing Pairs to file " + pairsName + "...";
@@ -152,17 +109,10 @@ int main(int argc, char** argv) {
     }
     
     
-    //Format points into unordered multimap
+    //Format points into unordered multimap DONE
     std::unordered_multimap<std::bitset<48>,std::bitset<32>> featureMultimap;
     featureMultimap = formatMultimap(pointPairs,filmID,logEnable,logFile);
     if(logEnable == 1){logFile << "Formatted multimap.\n\n";}
-       
     
-    if(logEnable == 1){logFile << "----------------------------------------------------\n\n\n";logFile.close();}
-    return 0;
-    }
-    catch(std::exception& e){
-        if(logEnable == 1){logFile << "Unknown error.\n";}
-    }
+    return featureMultimap;
 }
-
