@@ -2,6 +2,7 @@
 #include <aquila/transform/Spectrogram.h>
 #include <aquila/aquila.h>
 #include <vector>
+#include <complex>
 
 std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram, int logEnable, std::ofstream& logFile) {
     if(logEnable == 1){logFile << "Running computeLog...";}
