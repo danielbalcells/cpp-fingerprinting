@@ -311,6 +311,17 @@ std::vector<double> locMax(std::vector<double> x){
 //PROBLEMS.
 //IT WAS LIATING SO NOW SD IS AN INTEGER :D
 std::vector<double> spread(std::vector<double> x, int sd){
+    
+//    //TEST VECTOR -Dani
+//    for(int i = 0; i < x.size(); i++){
+//        if(i == 15 || i == 60){
+//            x[i] = 3;
+//        }else if(i == 120){
+//            x[i] = 1;
+//        }else{
+//            x[i] = 0;
+//        }
+//    }
     std::vector<double> xLocMaxes = locMax(x);
     int W = 4*sd;
     double gaussIndexs[W+1];  //NOT USING THE PUNK WORKAROUND->VERY PUNK WORKAROUND. LETS SEE IF SD IS ALWAYS AN INT AND WE CAN AVOID THIS MEASURE :D
@@ -321,45 +332,63 @@ std::vector<double> spread(std::vector<double> x, int sd){
     y *= 0;
     int j=0;
     
-    std::ofstream logFile;
-    logFile.open("logs/logSpread.txt", std::ios::app);
+//    std::ofstream logFile;
+//    logFile.open("logs/logSpread.txt", std::ios::trunc);
     
-    logFile << "This is EVector: \n";
+    //logFile << "This is EVector: \n"; WORKS FINE -Dani
     for(int i=-W; i<W+1; i++){
         //E=exp(-0.5*[(-W:W)/E].^2);
         //gaussIndexs[i] = pow((i/sd),2);
-        logFile << std::to_string(i) << "     " << std::to_string((double)((double)i/(double)sd)) << "     " ;
+        //logFile << std::to_string(i) << "     " << std::to_string((double)((double)i/(double)sd)) << "     " ;
         thisE = exp(-0.5*(pow((double)((double)i/(double)sd),2)));
-        logFile << std::to_string(thisE) << std::endl;
+        //logFile << std::to_string(thisE) << std::endl;
         EVector.push_back(thisE);
-        logFile << std::to_string(j) << "     " << std::to_string(EVector[j]) << std::endl;
+        //logFile << std::to_string(j) << "     " << std::to_string(EVector[j]) << std::endl;
         j++;
     }
-    logFile << "EVector size is: " << std::to_string(EVector.size()) << std::endl;
+    //logFile << "EVector size is: " << std::to_string(EVector.size()) << std::endl;
     std::valarray<double> E(EVector.data(), EVector.size());
     int lenx = x.size();
     int maxi = lenx + E.size();
     int spos = 1+round((E.size()-1)/2);
     std::vector<double> EE(maxi);
+    //logFile << "Start pos: " + std::to_string(spos) + "\n";
     for (int i=0; i<xLocMaxes.size(); i++){
         if (xLocMaxes[i]>0){
             double locMaxi = xLocMaxes[i];
-            std::fill(std::begin(EE), std::begin(EE)+i, 0);
-            EE.insert(std::begin(EE)+i+1, std::begin(E), std::end(E));
-            EE[maxi]=0;
-            EE2 = std::vector<double>(std::begin(EE)+spos,std::begin(EE)+spos+lenx);
-            for(int i=0; i<lenx; i++){
-                y[i] = std::fmax(y[i], locMaxi*EE2[i]);
+            //NO FUNCIONA, INSERT CANVIA LA MIDA DE EE EN CADA ITERACIÓ -Dani
+//            std::fill(std::begin(EE), std::begin(EE)+i, 0);
+//            EE.insert(std::begin(EE)+i+1, std::begin(E), std::end(E));
+            
+            //ACTUALITZAT: PRIMER OMPLIR EE AMB ZEROS, DESPRÉS COPIAR E A PARTIR DE LA MOSTRA i -Dani
+            std::fill(EE.begin(),EE.end(),0);
+            for(int j = 0; j<E.size(); j++){
+                EE[i+j+1] = E[j];
             }
+            
+            EE[maxi]=0;
+            //std::cout << "EE vector size is " + std::to_string(EE.size()) + "\n"; //DEBUG (NOT USED NOW, WORKS FINE) -Dani
+            EE2 = std::vector<double>(std::begin(EE)+spos,std::begin(EE)+spos+lenx);
+            for(int j=0; j<lenx; j++){
+                y[j] = std::fmax(y[j], locMaxi*EE2[j]);
+            }
+            
+            //MORE DEBUG (NOT USED NOW; WORKS FINE) -Dani
+//            logFile << "\nMasking max at pos " + std::to_string(i) + " with vector EE2: \n" << std::endl;
+//            logFile << "EE2Vector size is: " << std::to_string(EE2.size()) << std::endl;
+//            for (int j=0; j<EE2.size(); j++){
+//                logFile << std::to_string(EE2[j]) << std::endl;
+//            }
         }
     }
+    
     std::vector<double> retVector(std::begin(y), std::end(y));
-    logFile << "retVector is: \n" << std::endl;
-    for (int i=0; i<retVector.size(); i++){
-        logFile << std::to_string(retVector[i]) << std::endl;
-    }
-    logFile << "\n\nReturning control to extractMaxes.\n\n";
-    return retVector;
+//    logFile << "retVector is: \n" << std::endl;
+//    for (int i=0; i<retVector.size(); i++){
+//        logFile << std::to_string(retVector[i]) << std::endl;
+//    }
+//    logFile << "\n\nReturning control to extractMaxes.\n\n";
+//    return retVector;
 }
 
 //template <typename T>
