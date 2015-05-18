@@ -160,14 +160,17 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
     // initial threshold envelope based on peaks in first 10 frames
     std::vector<double> firstMaxesVector;
     std::vector<double> spectrogramRow(minimum);
+    //if(logEnable == 1){logFile << "Finding max value for each fbin along first 10 spectrogram frames.\n";}
     for (int j=0; j<nFft; j++){
         for (int i=0; i<minimum; i++){
             spectrogramRow[i] = hpfZMLSpectrogram[i][j];
         }
         firstMaxesVector.push_back(*std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow)));
+        //if(logEnable == 1){logFile << "\tFbin #" + std::to_string(j) + ":\t" + std::to_string(*std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow))) +"\n";}
     }
     std::vector<double> sthresh;
     sthresh = spread(firstMaxesVector, f_sd);
+    
     
     //EXTRACT MAXES OF THE SPECTROGRAM
     int thisFrameIndex = 0; 
@@ -177,19 +180,19 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
         for (int i=0; i<thisFrame.size();i++){
             sdiff[i] = std::fmax(0,thisFrame[i]-(0.5*sthresh[i]));
         }
-        std::cout << "This are sdiff, sthresh , (thisFrame[i]-sthresh[i]) and thisFrame[i]:\n";
+        logFile << "This are sdiff, sthresh , (thisFrame[i]-sthresh[i]) and thisFrame[i]:\n";
         for (int i=0; i<sdiff.size(); i++){
-            std::cout << std::to_string(sdiff[i]) << "      ";
-            std::cout << std::to_string(sthresh[i]) << "      ";
-            std::cout << std::to_string(thisFrame[i]-sthresh[i]) << "      ";
-            std::cout << std::to_string(thisFrame[i]) << "\n";
+            logFile << std::to_string(sdiff[i]) << "      ";
+            logFile << std::to_string(sthresh[i]) << "      ";
+            logFile << std::to_string(thisFrame[i]-sthresh[i]) << "      ";
+            logFile << std::to_string(thisFrame[i]) << "\n";
         }
         sdiff = locMax(sdiff);
         std::vector<double> thisFrameLocMax;
         thisFrameLocMax = locMax(thisFrame);
-        std::cout << "This are thisFrame locMaxes:\n";
+        logFile << "This are thisFrame locMaxes:\n";
         for (int i=0; i<thisFrame.size(); i++){
-            std::cout << std::to_string(thisFrameLocMax[i]) << "\n";
+            logFile << std::to_string(thisFrameLocMax[i]) << "\n";
         }
         //MAKE SURE LAST BIN IS ALWAYS 0. NOT NEEDED IN C++ AS FIRST INDEX IS 0.
         //sdiff[thisFrame.size()-1] = 0;
@@ -197,8 +200,8 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
         std::vector<int> peaks(sdiff.size());
         for (int i=0; sdiff[sortedIndexs[i]]>0; i++){
             peaks[i]=sortedIndexs[i];
-            std::cout << "TOLA";
-            std::cout << std::to_string(peaks[i]) << "\n";
+            logFile << "TOLA";
+            logFile << std::to_string(peaks[i]) << "\n";
         }
         int nmaxthistime = 0;
         int thisPeakIndex;
@@ -209,8 +212,8 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
                 if (thisFrame[i]>sthresh[i]){
                     thisMax[0] = thisFrameIndex;
                     thisMax[1] = thisPeakIndex;
-                    //std::cout << "FI= " << std::to_string(thisFrameIndex) <<"   ";
-                    //std::cout << "PI= " << std::to_string(thisPeakIndex) << "\n";
+                    //logFile << "FI= " << std::to_string(thisFrameIndex) <<"   ";
+                    //logFile << "PI= " << std::to_string(thisPeakIndex) << "\n";
                     //maxes[nmaxes][1]=thisFrameIndex;
                     //maxes[nmaxes][2]=thisPeakIndex;
                     maxes.push_back(thisMax);
@@ -317,18 +320,22 @@ std::vector<double> spread(std::vector<double> x, int sd){
     std::valarray<double> y(xLocMaxes.data(),xLocMaxes.size());
     y *= 0;
     int j=0;
-    std::cout << "This is EVector: \n";
+    
+    std::ofstream logFile;
+    logFile.open("logs/logSpread.txt", std::ios::app);
+    
+    logFile << "This is EVector: \n";
     for(int i=-W; i<W+1; i++){
         //E=exp(-0.5*[(-W:W)/E].^2);
         //gaussIndexs[i] = pow((i/sd),2);
-        std::cout << std::to_string(i) << "     " << std::to_string((double)((double)i/(double)sd)) << "     " ;
+        logFile << std::to_string(i) << "     " << std::to_string((double)((double)i/(double)sd)) << "     " ;
         thisE = exp(-0.5*(pow((double)((double)i/(double)sd),2)));
-        std::cout << std::to_string(thisE) << std::endl;
+        logFile << std::to_string(thisE) << std::endl;
         EVector.push_back(thisE);
-        std::cout << std::to_string(j) << "     " << std::to_string(EVector[j]) << std::endl;
+        logFile << std::to_string(j) << "     " << std::to_string(EVector[j]) << std::endl;
         j++;
     }
-    std::cout << "EVector size is: " << std::to_string(EVector.size()) << std::endl;
+    logFile << "EVector size is: " << std::to_string(EVector.size()) << std::endl;
     std::valarray<double> E(EVector.data(), EVector.size());
     int lenx = x.size();
     int maxi = lenx + E.size();
@@ -347,10 +354,11 @@ std::vector<double> spread(std::vector<double> x, int sd){
         }
     }
     std::vector<double> retVector(std::begin(y), std::end(y));
-    std::cout << "retVector is: \n" << std::endl;
+    logFile << "retVector is: \n" << std::endl;
     for (int i=0; i<retVector.size(); i++){
-        std::cout << std::to_string(retVector[i]) << std::endl;
+        logFile << std::to_string(retVector[i]) << std::endl;
     }
+    logFile << "\n\nReturning control to extractMaxes.\n\n";
     return retVector;
 }
 

@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
             case 'l':
                 logEnable = 1;
                 logFileName = std::string(optarg);
-                logFile.open(logFileName, std::ios::app);
+                logFile.open(logFileName, std::ios::trunc);
                 logFile << "Log for Recomovie Fingerprinting Feature Extraction Test.\nRecomovie PAE - May 2015\n";
                 logFile << std::string(asctime(timeinfo)) + "\n\n";
                 break;

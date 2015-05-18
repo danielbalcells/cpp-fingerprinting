@@ -22,7 +22,7 @@ Aquila::Spectrogram computeSpectrogram(Aquila::WaveFile inFile, int logEnable, s
 std::vector<std::vector<double>> computeLog(Aquila::Spectrogram spectrogram, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> subtractMean(std::vector<std::vector<double>>& logSpectrogram, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram);
-std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram);
+std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram, int logEnable, std::ofstream& logFile);
 std::vector<std::vector<int>> pairPoints(std::vector<std::vector<int>> maxes, int logEnable, std::ofstream& logFile);
 std::unordered_multimap<std::bitset<48>,std::bitset<32>> formatMultimap(std::vector<std::vector<int>> pointPairs, int filmID, int logEnable, std::ofstream& logFile);
 
@@ -80,7 +80,7 @@ std::unordered_multimap<std::bitset<48>,std::bitset<32>> featureExtraction(std::
 ////    if(logEnable == 1){logFile << "Extracted salient spectrogram points.\n";}
 //    
     //Extract salient points from log spectrogram 
-    std::vector<std::vector<int>> maxes = extractMaxesDummy(logSpectrogram,logEnable,logFile);
+    std::vector<std::vector<int>> maxes = extractMaxes(logSpectrogram,logEnable,logFile);
     if(0 == 1){ //PUNK
    
         logFile << "Extracted salient spectrogram points.\n";
