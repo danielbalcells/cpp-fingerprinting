@@ -83,7 +83,8 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
     //       (proportion per frame).  A value closer to one means fewer
     //       peaks found.
     //a_dec = 0.998;
-    int a_dec = 1-0.01*(N/35);
+    //double a_dec = 1-0.1*(N/35);
+    double a_dec = 0.998;
     //0.999 -> 2.5
     //0.998 -> 5 hash/sec
     //0.997 -> 10 hash/sec
@@ -264,6 +265,7 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
             sthresh[i] = a_dec*sthresh[i];
         }
     }
+//    std::cout << "There are " << std::to_string(maxes.size()) <<" extracted maxes: " << std::endl;
 //    std::cout << "These are the extracted maxes: " << std::endl;
 //    for (int i=0; i<maxes.size(); i++){
 //        std::cout << "Frame: " << std::to_string(maxes[i][0]) << "      FreqBin: " << std::to_string(maxes[i][1]) << std::endl;
