@@ -14,6 +14,13 @@
  * 
  */
 std::vector<std::vector<double>> hpFilterRows(std::vector<std::vector<double>> zmlSpectrogram){
-    std::vector<std::vector<double>> hpfZMLSpectrogram(4,std::vector<double>(2));
+    int i,j;
+    std::vector<std::vector<double>> hpfZMLSpectrogram(zmlSpectrogram.size(),std::vector<double>(zmlSpectrogram[0].size()));
+    for (j=0;j<zmlSpectrogram[0].size();j++){
+        hpfZMLSpectrogram[0][j] = zmlSpectrogram[0][j];
+        for (i=1; i<zmlSpectrogram.size();i++){
+            hpfZMLSpectrogram[i][j] = zmlSpectrogram[i][j]-0.02*hpfZMLSpectrogram[i-1][j];
+        }
+    }
     return hpfZMLSpectrogram;
 }
