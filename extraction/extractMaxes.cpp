@@ -33,6 +33,7 @@ std::vector<int> sort_indexes(const std::vector<T> &v) {
   std::sort(idx.begin(), idx.end(),
        [&v](int i1, int i2) {return v[i1] < v[i2];});
 
+  std::reverse(idx.begin(),idx.end());
   return idx;
 }
 
@@ -46,7 +47,7 @@ std::vector<int> sort_indexes(const std::vector<T> &v) {
 //}
 
 std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZMLSpectrogram, int logEnable, std::ofstream& logFile){
-    //INITIALIZE RETURN VECTOR OF VECTORS WITH MAXES
+    //INITIALIZE OUTPUT VECTOR OF VECTORS WITH MAXES
     if (logEnable==1){
         logFile << "Running extractMaxes..\n";
     }
@@ -166,54 +167,84 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
         }
         firstMaxesVector.push_back(*std::max_element(std::begin(spectrogramRow), std::end(spectrogramRow)));
     }
+//    std::cout << "This is the vector with the first maxes" << std::endl;
+//    for (int i=0; i<nFft; i++){
+//        std::cout << std::to_string(firstMaxesVector[i]) << std::endl;
+//    }
     std::vector<double> sthresh;
     sthresh = spread(firstMaxesVector, f_sd);
+//    std::cout << "This is sthresh" << std::endl;
+//    for (int i=0; i<sthresh.size(); i++){
+//        std::cout << std::to_string(sthresh[i]) << std::endl;
+//    }
+
+    //EVERYTHING WORKING UNTIL HERE. COMPARED WITH OUTPUT OF MATLAB VERSION
+    
+/*
+ *BLOC 2
+ * AQUEST BLOC ES ON ES TROBEN ELS MAXIMS PROPIAMENT.
+ * ES VAN AGAFANT ELS FRAMES DE L'ESPECTROGRAMA I ES MIRA SI ALGUN DELS SEUS PUNTS ESTÀ PER SOBRE 
+ * DEL THRESHOLD QUE ES VA ACTUALITZANT. 
+ * 
+ * ES ON HI HA EL "PROBLEMA" ARA. MAI HI HA CAP PUNT PER SOBRE DEL THRESHOLD. AIXÒ FA PENSAR QUE EL
+ * THRESOLD ES CALCULA MALAMENT.
+ * PER ASSEGURAR QUE ÉS AQUEST EL PROBLEMA MOLARIA COMPARAR L'ESPECTROGRAMA QUE SURT DEL C++ AMB EL QUE
+ * SORTIA DEL MATLAB. 
+ * SI ES VEU QUE L'ESPECTROGRAMA ÉS EL MATEIX, EL PROBLEMA ESTARÀ AL CALCUL DEL THRESHOLD I CAL ENTRAR A SPREAD A MIRAR.
+ */
     
     //EXTRACT MAXES OF THE SPECTROGRAM
-    int thisFrameIndex = 0; 
+    int thisFrameIndex = 0;
+    std::vector<int> thisMax(2);
     for (thisFrameIndex=0; thisFrameIndex<nFrames; thisFrameIndex++){
         std::vector<double> thisFrame = hpfZMLSpectrogram[thisFrameIndex];
         std::vector<double> sdiff(thisFrame.size());
         for (int i=0; i<thisFrame.size();i++){
-            sdiff[i] = std::fmax(0,thisFrame[i]-(0.5*sthresh[i]));
+            sdiff[i] = std::fmax(0,thisFrame[i]-(sthresh[i]));
         }
-        std::cout << "This are sdiff, sthresh , (thisFrame[i]-sthresh[i]) and thisFrame[i]:\n";
-        for (int i=0; i<sdiff.size(); i++){
-            std::cout << std::to_string(sdiff[i]) << "      ";
-            std::cout << std::to_string(sthresh[i]) << "      ";
-            std::cout << std::to_string(thisFrame[i]-sthresh[i]) << "      ";
-            std::cout << std::to_string(thisFrame[i]) << "\n";
-        }
+//        std::cout << "This are sdiff, sthresh , (thisFrame[i]-sthresh[i]) and thisFrame[i]. Frame nº " << std::to_string(thisFrameIndex) << std::endl;
+//        for (int i=0; i<sdiff.size(); i++){
+//            std::cout << std::to_string(sdiff[i]) << "      ";
+//            std::cout << std::to_string(sthresh[i]) << "      ";
+//            std::cout << std::to_string(thisFrame[i]-sthresh[i]) << "      ";
+//            std::cout << std::to_string(thisFrame[i]) << "\n";
+//        }
         sdiff = locMax(sdiff);
         std::vector<double> thisFrameLocMax;
         thisFrameLocMax = locMax(thisFrame);
-        std::cout << "This are thisFrame locMaxes:\n";
-        for (int i=0; i<thisFrame.size(); i++){
-            std::cout << std::to_string(thisFrameLocMax[i]) << "\n";
-        }
+//        std::cout << "This are thisFrame locMaxes:\n";
+//        for (int i=0; i<thisFrame.size(); i++){
+//            std::cout << std::to_string(thisFrameLocMax[i]) << "\n";
+//        }
         //MAKE SURE LAST BIN IS ALWAYS 0. NOT NEEDED IN C++ AS FIRST INDEX IS 0.
         //sdiff[thisFrame.size()-1] = 0;
         std::vector<int> sortedIndexs = sort_indexes(sdiff);
         std::vector<int> peaks(sdiff.size());
+//        if (thisFrameIndex == 305){
+//            for (int i=0; i<nFft; i++){
+//                std::cout << std::to_string(i) << "   " << std::to_string(sdiff[i]) << "   " << std::to_string(sortedIndexs[i]) << std::endl;
+//            }
+//        }
+        //std::cout << "Frame nº " << std::to_string(thisFrameIndex) << std::endl;
         for (int i=0; sdiff[sortedIndexs[i]]>0; i++){
             peaks[i]=sortedIndexs[i];
-            std::cout << "TOLA";
-            std::cout << std::to_string(peaks[i]) << "\n";
+            //std::cout << std::to_string(peaks[i]) << std::endl;
         }
         int nmaxthistime = 0;
         int thisPeakIndex;
-        std::vector<int> thisMax(2);
         for (int i=0; i<peaks.size(); i++){
             thisPeakIndex = peaks[i];
             if (nmaxthistime < maxpksperframe){
-                if (thisFrame[i]>sthresh[i]){
+                if (thisFrame[thisPeakIndex]>sthresh[thisPeakIndex]){
                     thisMax[0] = thisFrameIndex;
                     thisMax[1] = thisPeakIndex;
                     //std::cout << "FI= " << std::to_string(thisFrameIndex) <<"   ";
-                    //std::cout << "PI= " << std::to_string(thisPeakIndex) << "\n";
+                    //std::cout << "PI= " << std::to_string(thisPeakIndex) << std::endl;
                     //maxes[nmaxes][1]=thisFrameIndex;
                     //maxes[nmaxes][2]=thisPeakIndex;
                     maxes.push_back(thisMax);
+                    //std::cout << "FI= " << std::to_string(maxes[nmaxes][0]) <<"   ";
+                    //std::cout << "PI= " << std::to_string(maxes[nmaxes][1]) << std::endl;
                     nmaxthistime++;
                     nmaxes++;
                     std::vector<double> eww(sthresh.size());
@@ -221,6 +252,7 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
                     for(int i=0; i<sthresh.size(); i++){
                         //eww = exp(-0.5*(([1:length(sthresh)]'- p)/f_sd).^2);
                         eww[i] = exp(-0.5*(pow(((i-thisPeakIndex)/f_sd),2))); //DONDE ES MEJOR DECLARARLO???
+                        
                     }
                     for (int i=0; i<sthresh.size(); i++){
                         sthresh[i] = std::fmax(sthresh[i],thisFrame[thisPeakIndex]*eww[i]);
@@ -232,32 +264,39 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
             sthresh[i] = a_dec*sthresh[i];
         }
     }
-    return maxes;
+//    std::cout << "These are the extracted maxes: " << std::endl;
+//    for (int i=0; i<maxes.size(); i++){
+//        std::cout << "Frame: " << std::to_string(maxes[i][0]) << "      FreqBin: " << std::to_string(maxes[i][1]) << std::endl;
+//    }
     
     //BACKWARDS PRUNING OF MAXES
     std::vector<std::vector<int>> maxes2;
     int nmaxes2 = 0;
-    int whichMax = nmaxes2;
+    int whichMax = nmaxes;
     std::vector<double> lastFrame = hpfZMLSpectrogram[nFrames-1];
     sthresh = spread(lastFrame,f_sd);
     int thisFrameIndex2;
     int thisPeakIndex2;
     double thisPeakValue;
-    for (int thisFrameIndex2=nFrames-1; thisFrameIndex2>=0; thisFrameIndex2--){
+    for (thisFrameIndex2=nFrames-1; thisFrameIndex2>=0; thisFrameIndex2--){
         std::vector<double> thisFrame2 = hpfZMLSpectrogram[thisFrameIndex2];
-        while (whichMax>0 && maxes[whichMax][1]==thisFrameIndex2){
-            thisPeakIndex2 = maxes[whichMax][1];
+        while (whichMax>0 && maxes[whichMax-1][0]==thisFrameIndex2){
+            thisPeakIndex2 = maxes[whichMax-1][1];
             thisPeakValue = hpfZMLSpectrogram[thisFrameIndex2][thisPeakIndex2];
+//            std::cout << "thisPeakValue = " << std::to_string(thisPeakValue) << "     " << "sthresh[thisPeakIndex2] = " << std::to_string(sthresh[thisPeakIndex2]) << std::endl;
             if (thisPeakValue>=sthresh[thisPeakIndex2]){
                 //Keep this one
-                maxes2[nmaxes2][1] = thisFrameIndex2;
-                maxes2[nmaxes2][2] = thisPeakIndex2;
+                thisMax[0] = thisFrameIndex2;
+                thisMax[1] = thisPeakIndex2;
+                maxes2.push_back(thisMax);
+                //maxes2[nmaxes2][0] = thisFrameIndex2;
+                //maxes2[nmaxes2][1] = thisPeakIndex2;
                 nmaxes2++;
                 std::vector<double> eww(sthresh.size());
                 //eww = exp(-0.5*(([1:length(sthresh)]'- p)/f_sd).^2);
                 for(int i=0; i<sthresh.size(); i++){
                     //eww = exp(-0.5*(([1:length(sthresh)]'- p)/f_sd).^2);
-                    eww[i] = exp(-0.5*(pow((double)((double)(i-thisPeakIndex2)/(double)f_sd),2))); //DONDE ES MEJOR DECLARARLO???
+                    eww[i] = exp(-0.5*(pow((double)((double)(i-thisPeakIndex2)/(double)f_sd),2)));
                 }
                 for (int i=0; i<sthresh.size(); i++){
                     sthresh[i] = std::fmax(sthresh[i],thisFrame2[thisPeakIndex2]*eww[i]);
@@ -272,11 +311,21 @@ std::vector<std::vector<int>> extractMaxes(std::vector<std::vector<double>> hpfZ
     
     std::reverse(maxes2.begin(), maxes2.end());
     
+//    std::cout << "There are " << std::to_string(maxes2.size()) << " extracted maxes2: " << std::endl;
+//    std::cout << "These are the extracted maxes2: " << std::endl;
+//    for (int i=0; i<maxes2.size(); i++){
+//        std::cout << "Frame: " << std::to_string(maxes2[i][0]) << "      FreqBin: " << std::to_string(maxes2[i][1]) << std::endl;
+//    }
+    
     return maxes2;
 }
 
 //RETURNS A VECTOR ONLY WITH THE VALUES THAT ARE LOCAL MAXIMA OF X AND 0s IN THE
 //REST OF POSITIONS.
+
+//LOCMAX HA SIGUT TESTEADA EN UN PROJECTE APART I FUNCIONA 100% SEGUR.
+//RETORNA UN VECTOR QUE MANTÉ ELS MÀXIMS LOCALS DEL VECTOR D'ENTRADA. 
+//POSA 0 A LA RESTA
 std::vector<double> locMax(std::vector<double> x){
     int i=0;
     std::vector<double> nbrVector;
@@ -303,67 +352,71 @@ std::vector<double> locMax(std::vector<double> x){
     return y;
 }
 
-//THIS IS THE MAGIC FUNCTION THAT SPREADS THE MAXIMA ACCORDING TO A GAUSSIAN SOMETHING.
-//IF SD IS ALWAYS AN INTEGER WE CAN USE INT INSTEAD OF DOUBLE. DONE THIS WAY TO AVOID
-//PROBLEMS.
-//IT WAS LIATING SO NOW SD IS AN INTEGER :D
+//THIS FUNCTION HAS NOW BEEN TESTED STEP BY STEP AND THE OUTPUT IS THE EXACT SAME AS THE 
+//ONE IN THE MATLAB VERSION. -Enric
 std::vector<double> spread(std::vector<double> x, int sd){
     std::vector<double> xLocMaxes = locMax(x);
     int W = 4*sd;
-    double gaussIndexs[W+1];  //NOT USING THE PUNK WORKAROUND->VERY PUNK WORKAROUND. LETS SEE IF SD IS ALWAYS AN INT AND WE CAN AVOID THIS MEASURE :D
     std::vector<double> EVector;
     double thisE;
     std::vector<double> EE2;
     std::valarray<double> y(xLocMaxes.data(),xLocMaxes.size());
     y *= 0;
     int j=0;
-    std::cout << "This is EVector: \n";
+//    std::cout << "This is EVector: \n";
     for(int i=-W; i<W+1; i++){
         //E=exp(-0.5*[(-W:W)/E].^2);
         //gaussIndexs[i] = pow((i/sd),2);
-        std::cout << std::to_string(i) << "     " << std::to_string((double)((double)i/(double)sd)) << "     " ;
+//        std::cout << std::to_string(i) << "     " << std::to_string((double)((double)i/(double)sd)) << "     " ;
         thisE = exp(-0.5*(pow((double)((double)i/(double)sd),2)));
-        std::cout << std::to_string(thisE) << std::endl;
+//        std::cout << std::to_string(thisE) << std::endl;
         EVector.push_back(thisE);
-        std::cout << std::to_string(j) << "     " << std::to_string(EVector[j]) << std::endl;
+//        std::cout /*<< std::to_string(j) << "     " */ << std::to_string(EVector[j]) << std::endl;
         j++;
     }
-    std::cout << "EVector size is: " << std::to_string(EVector.size()) << std::endl;
+    //FUNCIONA BÉ FINS AQUÍ 100% segur comparat amb output de MATLAB
+    
+    //A PARTIR D'AQUI ÉS CONSISTENT: NO PROBLEM DE TAMANYS ETC. 
+    //S'HA ANAT TRADUINT LITERALMENT DEL MATLAB. REVISAR-HO NO SERIA MALA IDEA PERO HAURIA D'ESTAR OKEI. JO HO HE REVISAT.
+//    std::cout << "EVector size is: " << std::to_string(EVector.size()) << std::endl;
     std::valarray<double> E(EVector.data(), EVector.size());
     int lenx = x.size();
     int maxi = lenx + E.size();
     int spos = 1+round((E.size()-1)/2);
+//    std::cout << "These are lenx, maxi, spos" << std::endl;
+//    std::cout << std::to_string(lenx) << "      " << std::to_string(maxi) << "      " << std::to_string(spos) << std::endl;
+    //FUNCIONA BÉ FINS AQUÍ 100% segur comparat amb output de MATLAB
     std::vector<double> EE(maxi);
     for (int i=0; i<xLocMaxes.size(); i++){
         if (xLocMaxes[i]>0){
             double locMaxi = xLocMaxes[i];
-            std::fill(std::begin(EE), std::begin(EE)+i, 0);
-            EE.insert(std::begin(EE)+i+1, std::begin(E), std::end(E));
-            EE[maxi]=0;
+            //NO FUNCIONA, INSERT CANVIA LA MIDA DE EE EN CADA ITERACIÓ -Dani
+
+            //std::fill(std::begin(EE), std::begin(EE)+i, 0);
+            //EE.insert(std::begin(EE)+i+1, std::begin(E), std::end(E));
+            
+            //ACTUALITZAT: PRIMER OMPLIR EE AMB ZEROS, DESPRÉS COPIAR E A PARTIR DE LA MOSTRA i -Dani
+            std::fill(EE.begin(),EE.end(),0);
+            for(int j = 0; j<E.size(); j++){
+                EE[i+j+1] = E[j];
+            }
+            EE[maxi-1]=0;
             EE2 = std::vector<double>(std::begin(EE)+spos,std::begin(EE)+spos+lenx);
+            
             for(int i=0; i<lenx; i++){
                 y[i] = std::fmax(y[i], locMaxi*EE2[i]);
             }
         }
     }
+//    Print final EE2 to output
+//    for (int i=0; i<lenx; i++){
+//        std::cout << std::to_string(EE2[i]) << std::endl;
+//    }
+    
     std::vector<double> retVector(std::begin(y), std::end(y));
-    std::cout << "retVector is: \n" << std::endl;
-    for (int i=0; i<retVector.size(); i++){
-        std::cout << std::to_string(retVector[i]) << std::endl;
-    }
+//  std::cout << "retVector is: \n" << std::endl;
+//    for (int i=0; i<retVector.size(); i++){
+//        std::cout << std::to_string(retVector[i]) << std::endl;
+//    }
     return retVector;
 }
-
-//template <typename T>
-//std::vector<size_t> sort_indexes(const std::vector<T> &v) {
-//
-//  // initialize original index locations
-//  std::vector<size_t> idx(v.size());
-//  for (size_t i = 0; i != idx.size(); ++i) idx[i] = i;
-//
-//  // sort indexes based on comparing values in v
-//  std::sort(idx.begin(), idx.end(),
-//       [&v](size_t i1, size_t i2) {return v[i1] < v[i2];});
-//
-//  return idx;
-//}

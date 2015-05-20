@@ -51,7 +51,7 @@ std::vector<std::vector<int>> pairPoints(std::vector<std::vector<int>> maxes, in
                 candidateF = maxes[j][1];
                 //if(logEnable == 1){logFile << "Candidate point: " + std::to_string(candidateT) + "-" + std::to_string(candidateF) + "\n";}
                 if((candidateT-anchorPointT)<rectangleRight && (candidateT-anchorPointT) > rectangleLeft){
-                    if((candidateF-anchorPointF)<rectangleTop && (candidateF-anchorPointF) > rectangleBottom){//Match!
+                    if((candidateF-anchorPointF)<rectangleTop && (candidateF-anchorPointF) > rectangleBottom){//You have a new match!
                         pointPairs[foundPairs][0] = anchorPointF; //F1
                         pointPairs[foundPairs][1] = candidateF; //F2
                         pointPairs[foundPairs][2] = candidateT - anchorPointT; //T2-T1
